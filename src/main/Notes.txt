@@ -1,0 +1,100 @@
+HTML RESPONSE:
+    In html the response consists of the following:
+        Response      = Status-Line               ; Section 6.1
+                           (( general-header        ; Section 4.5
+                            | response-header        ; Section 6.2
+                            | entity-header ) CRLF)  ; Section 7.1
+                           CRLF
+                           [ message-body ]
+
+                           eg)
+
+                           HTTP/1.1 200 OK             //status line
+                           Content-Length: 438         //entity header
+                           Content-Type: text/plain    //entity header
+
+                           Response body ...           //message body
+
+
+                           Defined here: https://datatracker.ietf.org/doc/html/rfc2616#section-6
+
+            Status Line:
+                SL consists of 3 main parts: Http version, status code, and reason-phrase. This is presented in the following format:
+                Status-Line = HTTP-Version SP Status-Code SP Reason-Phrase CRLF
+
+                Defined here: https://datatracker.ietf.org/doc/html/rfc2616#section-6.1
+
+
+                HTTP-Version:
+                    Defines the Http Version the server is sending respones in so the client knows the format in which it is receiving messages.
+                    Format Below:
+                        HTTP-Version   = "HTTP" "/" 1*DIGIT "." 1*DIGIT
+
+                        eg) "HTTP/1.1"
+
+                    Defined here:  https://datatracker.ietf.org/doc/html/rfc2616#section-3.1
+                Status Code:
+                    Defines how the requested operation went internally.
+                    The Status code groups are as follows:
+                        1xx: Informational
+                        2xx: Success
+                        3xx: Redirection
+                        4xx: Client error
+                        5xx: Server error
+                        Defined here: https://datatracker.ietf.org/doc/html/rfc2616#section-6.1.1
+
+                    >Just place in a string as a 3 digit in<
+                Reason Phrase:
+                    "intended to give a short
+                        textual description of the Status-Code. The Status-Code is intended
+                        for use by automata and the Reason-Phrase is intended for the human
+                        user. The client is not required to examine or display the Reason-
+                        Phrase."
+                    TDLR: Explains the error code incase a human is debugging or something
+
+
+            Headers:
+                Headers are used to give the client info about the response and the message attached.
+                Headers are in the following format:
+                "Header-Field" ":" sp "field value" CRLF
+                eg: "Content-Type: text/plain \r\n"
+
+
+
+                General Header:
+                    A header in that doesnt apply to the content of the message but the message itself.
+                    TODO make a note of what the fuck this actually means when you understand it
+
+                    (Barely) Defined Here: https://datatracker.ietf.org/doc/html/rfc2616#section-4.5
+
+                Response Header:
+                    A place for the server to pass additional info about the response. Often gives info about server information and further access to it identified by the request URI
+
+                    Defined: https://datatracker.ietf.org/doc/html/rfc2616#section-6.2
+
+                Entity Header:
+                    Consists of a header and body (although the body isn't always send (or the entity header all together if restricted by the request method or status code.
+
+                    Entity Header-Header:
+                        Define metainfo about the entity body. If not body is present then about the resource that is being requested.
+
+                    Entity Header-Body:
+                        The entity header body is placed in a format and encoding defined by the entity header-header.
+                        A entity header body is sent only when message body is sent.
+
+                        message-body = entity-body
+                                            | <entity-body encoded as per Transfer-Encoding>
+
+                        this is to ensure a proper, safe, and full response from the server to the client.
+
+                        When a body is included, the header SHOULD have a content type and content encoding. These define a 2 layer model:
+                            entity-body := Content-Encoding( Content-Type( data ) )
+
+                        Any HTTP/1.1 message should include a content type header field
+
+                Message Body:
+                    The message body (if any) contains the requested information the browser asked for. It is similar to the entity body aside from the optional transfer endcoding:
+                     message-body = entity-body
+                                        | <entity-body encoded as per Transfer-Encoding>
+
+
