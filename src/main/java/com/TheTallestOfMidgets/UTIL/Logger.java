@@ -1,7 +1,7 @@
 package com.TheTallestOfMidgets.UTIL;
 
 public class Logger {
-    private Class clazz;
+    private final Class clazz;
 
     public Logger(Class clazz) {
         this.clazz = clazz;
@@ -26,5 +26,6 @@ public class Logger {
                 clazz.getPackage().toString().replace("package ","") +
                 " - "  + msg;
         System.out.println(terminalString);
+        e.printStackTrace();
     }
 }

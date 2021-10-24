@@ -6,6 +6,7 @@ HTML RESPONSE:
                             | entity-header ) CRLF)  ; Section 7.1
                            CRLF
                            [ message-body ]
+                           CRLF CRLF
 
                            eg)
 
