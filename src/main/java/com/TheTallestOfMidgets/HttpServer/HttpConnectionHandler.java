@@ -1,5 +1,6 @@
 package com.TheTallestOfMidgets.HttpServer;
 
+import com.TheTallestOfMidgets.HttpProtocol.HttpMessageParser;
 import com.TheTallestOfMidgets.UTIL.Logger;
 
 import java.io.IOException;
@@ -35,14 +36,14 @@ public class HttpConnectionHandler extends Thread{
             LOGGER.info("Thread " + this.getId() + " reading request...");
 
             //TODO read browser request
-//                int _byte;
-//                while ((_byte = inputStream.read()) >= 0) {
-//                    System.out.print((char) _byte);
-//                }
+                HttpMessageParser httpMessageParser = new HttpMessageParser(inputStream);
+
+
             LOGGER.info("Thread " + this.getId() + "Done!");
 
             //TODO respond
             LOGGER.info("Thread " + this.getId() + " generating response");
+            sleep((long) Math.random()*800);
             String html = "<html><head><title>YOOO I'm In a tab</title><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"></head><body><div><h1>This is a website</h1></div></body></html>";
 
 
