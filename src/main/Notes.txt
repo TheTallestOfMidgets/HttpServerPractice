@@ -99,3 +99,27 @@ HTML RESPONSE:
                                         | <entity-body encoded as per Transfer-Encoding>
 
 
+HTML Request:
+    https://datatracker.ietf.org/doc/html/rfc2616#section-6
+    A request is typically sent from the browser to the server in order to request information
+    This request is made up of 5 parts, all of which are similar to a server response. It is in the following format:
+       Request       = Request-Line
+                            *(( general-header
+                             | request-header
+                             | entity-header ) CRLF)
+                            CRLF
+                            [ message-body ]
+
+
+       Request Line:
+            The request line is made up 3 parts, The method, the request Uri, and the http version
+            Request-Line   = Method SP Request-URI SP HTTP-Version CRLF
+
+
+            Method:
+                The method token indicates the process that needs to be preformed on the server's resource.
+                The server must return codes if a method is invalid or not allowed
+            Request URI:
+                The request uri defines the resource the request needs to be appied on.
+                Request-URI    = "*" | absoluteURI | abs_path | authority
+

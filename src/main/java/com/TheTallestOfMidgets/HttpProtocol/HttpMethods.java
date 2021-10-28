@@ -1,5 +1,4 @@
 package com.TheTallestOfMidgets.HttpProtocol;
 
-public class HttpResponse {
-
+public enum HttpMethods {
 }

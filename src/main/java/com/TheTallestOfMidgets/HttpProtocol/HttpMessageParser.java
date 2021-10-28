@@ -3,67 +3,39 @@ package com.TheTallestOfMidgets.HttpProtocol;
 
 import com.TheTallestOfMidgets.UTIL.ArrayList2String;
 
-import javax.print.DocFlavor;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+
 public class HttpMessageParser{
+    private static final int CR = 13;
+    private static final int LF = 10;
+    private static final int SP = 20;
 
     public HttpMessageParser(InputStream inputStream) throws IOException {
-        ArrayList<Integer> statusLine = new ArrayList<Integer>();
-        ArrayList<Integer> headers = new ArrayList<Integer>();
-        ArrayList<Integer> messageBody = new ArrayList<Integer>();
-
-        boolean statusLineRead = false;
-        boolean headersRead = false;
-        boolean messageBodyRead = false;
+        ArrayList<Integer> request = new ArrayList<Integer>();
 
         int _byte;
-        while((_byte = inputStream.read()) >= 0){
-            if(!statusLineRead){
-                //parsing and stuff
-                if(_byte == 13){
+        while((_byte = inputStream.read()) >= 0) {
+            if(_byte == CR){
+                request.add(_byte);
+                _byte = inputStream.read();
+                if(_byte == LF){
+                    request.add(_byte);
                     _byte = inputStream.read();
-                    if(_byte == 10){
-                        statusLineRead = true;
-                    }
-                }else{
-                    statusLine.add(_byte);
-                }
-
-            } else if(!headersRead){
-                //parsing and stuff
-                if(_byte == 13) {
-                    _byte = inputStream.read();
-                    if (_byte == 10) {
+                    if(_byte == CR){
+                        request.add(_byte);
                         _byte = inputStream.read();
-                        if (_byte == 13) {
-                            _byte = inputStream.read();
-                            if (_byte == 10) {
-                                headersRead = true;
-                            }
+                        if(_byte == LF){
+                            request.add(_byte);
+                            break;
                         }
                     }
-                }else{
-                    headers.add(_byte);
                 }
             }
-//            else if(!messageBodyRead){
-//                //parsing and stuff
-//
-//                messageBodyRead = true;
-//            }
-            else{
-                break;
-            }
+            request.add(_byte);
         }
-        System.out.println("Status Line: " + ArrayList2String.IntArrayList2String(statusLine));
-        System.out.println("Headers: " + ArrayList2String.IntArrayList2String(headers));
-        System.out.println("Message Body: " + ArrayList2String.IntArrayList2String(messageBody));
     }
-
-
 }
