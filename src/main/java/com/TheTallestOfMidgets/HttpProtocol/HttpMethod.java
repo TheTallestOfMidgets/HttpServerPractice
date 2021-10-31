@@ -1,4 +1,5 @@
 package com.TheTallestOfMidgets.HttpProtocol;
 
-public enum HttpMethods {
+public enum HttpMethod {
+    GET, POST;
 }

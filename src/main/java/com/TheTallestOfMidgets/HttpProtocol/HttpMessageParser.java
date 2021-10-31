@@ -13,29 +13,29 @@ public class HttpMessageParser{
     private static final int CR = 13;
     private static final int LF = 10;
     private static final int SP = 20;
+    private InputStream inputStream;
+
+    private boolean startLineRead = false;
+    private boolean headersRead = false;
+    private boolean hasMessageBody = false;
+    private boolean messageBodyRead = false;
+
+    private HttpRequest request;
+
 
     public HttpMessageParser(InputStream inputStream) throws IOException {
-        ArrayList<Integer> request = new ArrayList<Integer>();
-
-        int _byte;
-        while((_byte = inputStream.read()) >= 0) {
-            if(_byte == CR){
-                request.add(_byte);
-                _byte = inputStream.read();
-                if(_byte == LF){
-                    request.add(_byte);
-                    _byte = inputStream.read();
-                    if(_byte == CR){
-                        request.add(_byte);
-                        _byte = inputStream.read();
-                        if(_byte == LF){
-                            request.add(_byte);
-                            break;
-                        }
-                    }
-                }
-            }
-            request.add(_byte);
-        }
+        this.startLineRead = false;
+        this.headersRead = false;
+        this.hasMessageBody = false;
+        this.messageBodyRead = false;
+        this.request = new HttpRequest();
     }
+    /*
+    TODO:
+        this :)
+     */
+    public HttpRequest parseMessage(){}
+    private HttpStartLine parseStartLine(){}
+    private HttpHeader[] parseHeaders(){}
+    private String parseMessageBody(){}
 }
