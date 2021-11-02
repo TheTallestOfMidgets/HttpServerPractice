@@ -45,13 +45,11 @@ public class HttpConnectionHandler extends Thread{
 
             //TODO respond
             LOGGER.info("Thread " + this.getId() + " generating response");
-            sleep((long) (Math.random() * 800));
             String html = "<html><head><title>YOOO I'm In a tab</title><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"></head><body><div><h1>This is a website (and sorry matt, p5 does not like http protocol)</h1></div></body></html>";
 
 
             String response = "HTTP/1.1 200 OK" + CRLF +
-                    "Content-Length: " + html.getBytes().length +
-                    CRLF +
+                    "Content-Length: " + html.getBytes().length + CRLF +
                     CRLF +
                     html +
                     CRLF + CRLF;

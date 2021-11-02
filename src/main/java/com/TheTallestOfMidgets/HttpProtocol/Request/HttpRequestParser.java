@@ -60,12 +60,11 @@ public class HttpRequestParser{
                         _byte = inputStream.read();
                         if (_byte == LF) {
                             _byte = inputStream.read();
+                            request.addHeader(parseHeader(requestBuffer));
+                            requestBuffer.clear();
                             if (_byte == CR) {
                                 _byte = inputStream.read();
                                 if (_byte == LF) {
-                                    request.addHeader(parseHeader(requestBuffer));
-                                    requestBuffer.clear();
-
                                     headersRead = true;
                                     for (HttpHeader header : request.getHeaders()) {
                                         if (header.getField().equalsIgnoreCase("Content-Length")) {
@@ -77,9 +76,6 @@ public class HttpRequestParser{
                                         break;
                                     }
                                 }
-                            } else {
-                                request.addHeader(parseHeader(requestBuffer));
-                                requestBuffer.clear();
                             }
                         }
                     }
