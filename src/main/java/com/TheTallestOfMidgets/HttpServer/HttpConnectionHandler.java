@@ -36,8 +36,10 @@ public class HttpConnectionHandler extends Thread{
             LOGGER.info("Thread " + this.getId() + " reading request...");
 
             //TODO read browser request
-                HttpRequestParser httpRequestParser = new HttpRequestParser(inputStream);
-                httpRequestParser.parseRequest();
+                if(inputStream.available() > 0) {
+                    HttpRequestParser httpRequestParser = new HttpRequestParser(inputStream);
+                    httpRequestParser.parseRequest().print();
+                }
 
             LOGGER.info("Thread " + this.getId() + " Done!");
 

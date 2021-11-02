@@ -37,67 +37,74 @@ public class HttpRequestParser{
         LOGGER.info("Initalized parser");
     }
 
-    public void parseRequest() throws IOException {
-        LOGGER.info("Running Parser");
-        int _byte;
-        ArrayList<Integer> requestBuffer = new ArrayList<>(); //Used to store the current block of the request we are on
-        while(true){
-            _byte = inputStream.read();
-            if(!requestLineRead){
-                if(_byte == CR){
-                    _byte = inputStream.read();
-                    if(_byte == LF){
-                        requestLineRead = true;
-                        request.setRequestLine(parseRequestLine(requestBuffer));
-                        requestBuffer.clear();
-                    }
-                }
-                requestBuffer.add(_byte);
-            }else if(!headersRead){
-                if(_byte == CR) {
-                    _byte = inputStream.read();
-                    if (_byte == LF) {
+    public HttpRequest parseRequest() throws IOException {
+        ArrayList<Integer> requestBuffer = null;
+        try {
+            LOGGER.info("Running Parser");
+            int _byte = 0;
+            requestBuffer = new ArrayList<>(); //Used to store the current block of the request we are on
+            while (_byte >= 0) {
+                _byte = inputStream.read();
+                if (!requestLineRead) {
+                    if (_byte == CR) {
                         _byte = inputStream.read();
-                        if(_byte == CR) {
-                            _byte = inputStream.read();
-                            if (_byte == LF) {
-                                request.addHeader(parseHeader(requestBuffer));
-                                requestBuffer.clear();
-
-                                headersRead = true;
-                                for(HttpHeader header : request.getHeaders()){
-                                    if (header.getField().equalsIgnoreCase("Content-Length")){
-                                        hasMessageBody = true;
-                                        break;
-                                    }
-                                }
-                                if(!hasMessageBody){
-                                    break;
-                                }
-                            }
-                        }else{
-                            request.addHeader(parseHeader(requestBuffer));
+                        if (_byte == LF) {
+                            requestLineRead = true;
+                            request.setRequestLine(parseRequestLine(requestBuffer));
                             requestBuffer.clear();
                         }
                     }
-                }
-                requestBuffer.add(_byte);
-
-
-            }else if(hasMessageBody && !messageBodyRead){
-                requestBuffer.add(_byte);
-                for(int i = 0; i < Integer.parseInt(request.getValue("content-length")) - 1; i++){
-                    _byte = inputStream.read();
                     requestBuffer.add(_byte);
+                } else if (!headersRead) {
+                    if (_byte == CR) {
+                        _byte = inputStream.read();
+                        if (_byte == LF) {
+                            _byte = inputStream.read();
+                            if (_byte == CR) {
+                                _byte = inputStream.read();
+                                if (_byte == LF) {
+                                    request.addHeader(parseHeader(requestBuffer));
+                                    requestBuffer.clear();
+
+                                    headersRead = true;
+                                    for (HttpHeader header : request.getHeaders()) {
+                                        if (header.getField().equalsIgnoreCase("Content-Length")) {
+                                            hasMessageBody = true;
+                                            break;
+                                        }
+                                    }
+                                    if (!hasMessageBody) {
+                                        break;
+                                    }
+                                }
+                            } else {
+                                request.addHeader(parseHeader(requestBuffer));
+                                requestBuffer.clear();
+                            }
+                        }
+                    }
+                    requestBuffer.add(_byte);
+
+
+                } else if (hasMessageBody && !messageBodyRead) {
+                    requestBuffer.add(_byte);
+                    for (int i = 0; i < Integer.parseInt(request.getValue("content-length")) - 1; i++) {
+                        _byte = inputStream.read();
+                        requestBuffer.add(_byte);
+                    }
+                    request.setMessageBody(ArrayList2String.IntArray(requestBuffer));
+                    requestBuffer.clear();
+                    messageBodyRead = true;
+                    break;
+                } else {
+                    break;
                 }
-                request.setMessageBody(ArrayList2String.IntArray(requestBuffer));
-                messageBodyRead = true;
-                break;
-            }else{
-                break;
             }
+            return request;
+        } catch (OutOfMemoryError e) {
+            e.printStackTrace();
         }
-        request.print();
+        return null;
     }
     private HttpRequestLine parseRequestLine(ArrayList<Integer> rawRequest){
         String requestLine = ArrayList2String.IntArray(rawRequest);
