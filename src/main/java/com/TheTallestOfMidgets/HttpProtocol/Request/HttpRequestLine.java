@@ -1,10 +1,10 @@
-package com.TheTallestOfMidgets.HttpProtocol;
+package com.TheTallestOfMidgets.HttpProtocol.Request;
 
-public class HttpStartLine {
+public class HttpRequestLine {
     private final HttpMethod method;
     private final String requestURI;
     private final String version;
-    public HttpStartLine(HttpMethod method, String requestURI, String version){
+    public HttpRequestLine(HttpMethod method, String requestURI, String version){
         this.method = method;
         this.requestURI = requestURI;
         this.version = version;

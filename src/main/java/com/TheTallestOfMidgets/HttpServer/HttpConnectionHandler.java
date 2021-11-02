@@ -1,6 +1,6 @@
 package com.TheTallestOfMidgets.HttpServer;
 
-import com.TheTallestOfMidgets.HttpProtocol.HttpMessageParser;
+import com.TheTallestOfMidgets.HttpProtocol.Request.HttpRequestParser;
 import com.TheTallestOfMidgets.UTIL.Logger;
 
 import java.io.IOException;
@@ -36,10 +36,10 @@ public class HttpConnectionHandler extends Thread{
             LOGGER.info("Thread " + this.getId() + " reading request...");
 
             //TODO read browser request
-                HttpMessageParser httpMessageParser = new HttpMessageParser(inputStream);
+                HttpRequestParser httpRequestParser = new HttpRequestParser(inputStream);
+                httpRequestParser.parseRequest();
 
-
-            LOGGER.info("Thread " + this.getId() + "Done!");
+            LOGGER.info("Thread " + this.getId() + " Done!");
 
             //TODO respond
             LOGGER.info("Thread " + this.getId() + " generating response");
@@ -59,7 +59,7 @@ public class HttpConnectionHandler extends Thread{
 
 
 
-        } catch (Exception e){;
+        } catch (Exception e){
             LOGGER.error("Thread " + this.getId() +" failed!", e);
         }finally{
             LOGGER.info("Thread " + this.getId() + " closing...");

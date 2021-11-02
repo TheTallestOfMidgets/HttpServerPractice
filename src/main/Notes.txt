@@ -110,6 +110,8 @@ HTML Request:
                             CRLF
                             [ message-body ]
 
+    To properly parse a potential message body you must first check if any of the headers are entity-length headers,
+     if so we know after the double carriage return line feed following the heder block we can expect the defined number of bytes
 
        Request Line:
             The request line is made up 3 parts, The method, the request Uri, and the http version
@@ -122,4 +124,3 @@ HTML Request:
             Request URI:
                 The request uri defines the resource the request needs to be appied on.
                 Request-URI    = "*" | absoluteURI | abs_path | authority
-
