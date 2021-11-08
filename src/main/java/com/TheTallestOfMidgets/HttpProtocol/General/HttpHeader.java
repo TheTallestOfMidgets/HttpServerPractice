@@ -1,4 +1,4 @@
-package com.TheTallestOfMidgets.HttpProtocol;
+package com.TheTallestOfMidgets.HttpProtocol.General;
 
 public class HttpHeader {
     private final String field;

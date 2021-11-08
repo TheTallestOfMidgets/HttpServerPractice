@@ -1,5 +1,10 @@
 package com.TheTallestOfMidgets.HttpProtocol.Response;
 
-public class HttpResponse {
+import com.TheTallestOfMidgets.HttpProtocol.General.HttpHeader;
 
+import java.util.ArrayList;
+
+public class HttpResponse {
+    private HTTPStatusLine statusLine;
+    private ArrayList<HttpHeader> headers;
 }

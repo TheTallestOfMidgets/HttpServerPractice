@@ -1,16 +1,18 @@
 package com.TheTallestOfMidgets.HttpProtocol.Request;
 
+import com.TheTallestOfMidgets.HttpProtocol.General.HttpVersion;
+
 public class HttpRequestLine {
-    private final HttpMethod method;
+    private final String method;
     private final String requestURI;
-    private final String version;
-    public HttpRequestLine(HttpMethod method, String requestURI, String version){
+    private final HttpVersion version;
+    public HttpRequestLine(String method, String requestURI, HttpVersion version){
         this.method = method;
         this.requestURI = requestURI;
         this.version = version;
     }
 
-    public HttpMethod getMethod() {
+    public String getMethod() {
         return method;
     }
 
@@ -18,7 +20,7 @@ public class HttpRequestLine {
         return requestURI;
     }
 
-    public String getVersion() {
+    public HttpVersion getVersion() {
         return version;
     }
 

@@ -1,7 +1,6 @@
 package com.TheTallestOfMidgets.HttpProtocol.Request;
 
-import com.TheTallestOfMidgets.HttpProtocol.HttpHeader;
-import com.TheTallestOfMidgets.HttpProtocol.Request.HttpRequestLine;
+import com.TheTallestOfMidgets.HttpProtocol.General.HttpHeader;
 
 import java.util.ArrayList;
 
@@ -18,8 +17,8 @@ public class HttpRequest { //what the client sends to the server, packed into on
         return requestLine;
     }
 
-    public void setRequestLine(HttpRequestLine startLine) {
-        this.requestLine = startLine;
+    public void setRequestLine(HttpRequestLine requestLine) {
+        this.requestLine = requestLine;
     }
 
     public ArrayList<HttpHeader> getHeaders() {
@@ -49,7 +48,7 @@ public class HttpRequest { //what the client sends to the server, packed into on
 
     public void print(){
         System.out.println("Request Line: ");
-        System.out.println("     Request Line: " + requestLine.getMethod().name() + " " + requestLine.getRequestURI() + " " + requestLine.getVersion());
+        System.out.println("     Request Line: " + requestLine.getMethod() + " " + requestLine.getRequestURI() + " HTTP/" + requestLine.getVersion().getMajor() + "." + requestLine.getVersion().getMinor());
         System.out.println("Headers: ");
         for(HttpHeader header : headers){
             System.out.println("     " + header.getField() + ": " + header.getValue());

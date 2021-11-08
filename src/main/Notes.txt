@@ -64,7 +64,7 @@ HTML RESPONSE:
 
                 General Header:
                     A header in that doesnt apply to the content of the message but the message itself.
-                    TODO make a note of what the fuck this actually means when you understand it
+                    A header that contained meta-data
 
                     (Barely) Defined Here: https://datatracker.ietf.org/doc/html/rfc2616#section-4.5
 

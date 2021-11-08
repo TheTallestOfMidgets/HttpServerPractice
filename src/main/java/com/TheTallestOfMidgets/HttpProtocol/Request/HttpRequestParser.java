@@ -1,7 +1,8 @@
 package com.TheTallestOfMidgets.HttpProtocol.Request;
 
 
-import com.TheTallestOfMidgets.HttpProtocol.HttpHeader;
+import com.TheTallestOfMidgets.HttpProtocol.General.HttpHeader;
+import com.TheTallestOfMidgets.HttpProtocol.General.HttpVersion;
 import com.TheTallestOfMidgets.UTIL.ArrayList2String;
 import com.TheTallestOfMidgets.UTIL.Logger;
 
@@ -34,7 +35,7 @@ public class HttpRequestParser{
         this.messageBodyRead = false;
         this.request = new HttpRequest();
         this.inputStream = inputStream;
-        LOGGER.info("Initalized parser");
+        LOGGER.info("Initialized parser");
     }
 
     public HttpRequest parseRequest() throws IOException {
@@ -105,9 +106,12 @@ public class HttpRequestParser{
     private HttpRequestLine parseRequestLine(ArrayList<Integer> rawRequest){
         String requestLine = ArrayList2String.IntArray(rawRequest);
         String[] pieces = requestLine.split(" ");
-        HttpMethod method = HttpMethod.getMethod(pieces[0]);
+        String method = pieces[0];
         String requestURI = pieces[1];
-        String version = pieces[2];
+        String[] rawVersion = pieces[2].split("/")[1].split("\\.");
+        int major = Integer.parseInt(rawVersion[0]);
+        int minor = Integer.parseInt(rawVersion[1]);
+        HttpVersion version = new HttpVersion(major, minor);
 
         return new HttpRequestLine(method,requestURI,version);
     }
