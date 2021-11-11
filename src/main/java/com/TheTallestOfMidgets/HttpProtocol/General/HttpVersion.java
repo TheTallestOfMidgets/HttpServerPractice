@@ -16,4 +16,8 @@ public class HttpVersion {
     public int getMinor() {
         return minor;
     }
+
+    public boolean equals(HttpVersion version){
+        return version.getMajor() == major && version.getMinor() == minor;
+    }
 }

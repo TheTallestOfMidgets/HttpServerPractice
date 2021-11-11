@@ -1,12 +1,20 @@
 package com.TheTallestOfMidgets.HttpServer;
 
+import com.TheTallestOfMidgets.HttpProtocol.Request.HttpRequest;
 import com.TheTallestOfMidgets.HttpProtocol.Request.HttpRequestParser;
+import com.TheTallestOfMidgets.HttpProtocol.Response.ResponseGenerator;
+import com.TheTallestOfMidgets.UTIL.Array2ArrayList;
+import com.TheTallestOfMidgets.UTIL.ArrayList2Array;
+import com.TheTallestOfMidgets.UTIL.ArrayList2String;
 import com.TheTallestOfMidgets.UTIL.Logger;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class HttpConnectionHandler extends Thread{
 
@@ -28,7 +36,7 @@ public class HttpConnectionHandler extends Thread{
         OutputStream outputStream = null;
         InputStream inputStream = null;
 
-        try {
+        masterBlock: try {
             outputStream = client.getOutputStream();
             inputStream = client.getInputStream();
             LOGGER.info("Thread " + this.getId() + " established connection with " + this.client.getInetAddress());
@@ -36,27 +44,28 @@ public class HttpConnectionHandler extends Thread{
             LOGGER.info("Thread " + this.getId() + " reading request...");
 
             //TODO read browser request
+            HttpRequest request;
                 if(inputStream.available() > 0) {
                     HttpRequestParser httpRequestParser = new HttpRequestParser(inputStream);
-                    httpRequestParser.parseRequest().print();
+                    request = httpRequestParser.parseRequest();
+                } else{
+                    break masterBlock;
                 }
 
             LOGGER.info("Thread " + this.getId() + " Done!");
 
             //TODO respond
+
+            ArrayList<Byte> response;
+            ResponseGenerator responseGenerator = new ResponseGenerator(request);
+            response = responseGenerator.generateResponse();
+
             LOGGER.info("Thread " + this.getId() + " generating response");
             String html = "<html><head><title>YOOO I'm In a tab</title><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"></head><body><div><h1>This is a website (and sorry matt, p5 does not like http protocol)</h1></div></body></html>";
 
+            outputStream.write(ArrayList2Array.byteArray(response));
 
-            String response = "HTTP/1.1 200 OK" + CRLF +
-                    "Content-Length: " + html.getBytes().length + CRLF +
-                    CRLF +
-                    html +
-                    CRLF + CRLF;
-
-            outputStream.write(response.getBytes());
             LOGGER.info("Thread " + this.getId() + " Response Sent!");
-
 
 
         } catch (Exception e){

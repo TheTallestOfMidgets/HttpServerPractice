@@ -5,6 +5,7 @@ import com.TheTallestOfMidgets.HttpProtocol.General.HttpHeader;
 import com.TheTallestOfMidgets.HttpProtocol.General.HttpVersion;
 import com.TheTallestOfMidgets.UTIL.ArrayList2String;
 import com.TheTallestOfMidgets.UTIL.Logger;
+import jdk.nashorn.internal.runtime.ParserException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,8 +39,8 @@ public class HttpRequestParser{
         LOGGER.info("Initialized parser");
     }
 
-    public HttpRequest parseRequest() throws IOException {
-        ArrayList<Integer> requestBuffer = null;
+    public HttpRequest parseRequest() {
+        ArrayList<Integer> requestBuffer;
         try {
             LOGGER.info("Running Parser");
             int _byte = 0;
@@ -69,8 +70,10 @@ public class HttpRequestParser{
                                     headersRead = true;
                                     for (HttpHeader header : request.getHeaders()) {
                                         if (header.getField().equalsIgnoreCase("Content-Length")) {
-                                            hasMessageBody = true;
-                                            break;
+                                            if(Integer.parseInt(header.getValue()) > 0) {
+                                                hasMessageBody = true;
+                                                break;
+                                            }
                                         }
                                     }
                                     if (!hasMessageBody) {
@@ -98,32 +101,44 @@ public class HttpRequestParser{
                 }
             }
             return request;
-        } catch (OutOfMemoryError e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            LOGGER.error("Parsing Failed", e);
         }
         return null;
     }
-    private HttpRequestLine parseRequestLine(ArrayList<Integer> rawRequest){
-        String requestLine = ArrayList2String.IntArray(rawRequest);
-        String[] pieces = requestLine.split(" ");
-        String method = pieces[0];
-        String requestURI = pieces[1];
-        String[] rawVersion = pieces[2].split("/")[1].split("\\.");
-        int major = Integer.parseInt(rawVersion[0]);
-        int minor = Integer.parseInt(rawVersion[1]);
-        HttpVersion version = new HttpVersion(major, minor);
+    private HttpRequestLine parseRequestLine(ArrayList<Integer> rawRequest) throws ParserException{
+        try {
+            String requestLine = ArrayList2String.IntArray(rawRequest);
+            String[] pieces = requestLine.split(" ");
+            String method = pieces[0];
+            String requestURI = pieces[1];
+            String[] rawVersion = pieces[2].split("/")[1].split("\\.");
+            int major = Integer.parseInt(rawVersion[0]);
+            int minor = Integer.parseInt(rawVersion[1]);
+            HttpVersion version = new HttpVersion(major, minor);
 
-        return new HttpRequestLine(method,requestURI,version);
+            return new HttpRequestLine(method, requestURI, version);
+        }catch (Exception e){
+            throw new ParserException("Request Line Parsing failed");
+        }
     }
-    private HttpHeader parseHeader(ArrayList<Integer> rawRequest){
-        String header = ArrayList2String.IntArray(rawRequest);
-        String[] pieces = header.split(":");
-        String field = pieces[0].toLowerCase();
-        String value = pieces[1].replace(" ", "");
+    private HttpHeader parseHeader(ArrayList<Integer> rawRequest) throws ParserException{
+        try {
+            String header = ArrayList2String.IntArray(rawRequest);
+            String[] pieces = header.split(":");
+            String field = pieces[0].toLowerCase();
+            String value = pieces[1].replace(" ", "");
 
-        return new HttpHeader(field,value);
+            return new HttpHeader(field, value);
+        }catch (Exception e){
+            throw new ParserException("Header Parsing Failed");
+        }
     }
-    private String parseMessageBody(ArrayList<Integer> rawRequest){
-        return ArrayList2String.IntArray(rawRequest);
+    private String parseMessageBody(ArrayList<Integer> rawRequest) throws ParserException{
+        try {
+            return ArrayList2String.IntArray(rawRequest);
+        }catch (Exception e){
+            throw new ParserException("Header Parsing Failed");
+        }
     }
 }
