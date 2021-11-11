@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -61,14 +62,15 @@ public class HttpConnectionHandler extends Thread{
             response = responseGenerator.generateResponse();
 
             LOGGER.info("Thread " + this.getId() + " generating response");
-            String html = "<html><head><title>YOOO I'm In a tab</title><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"></head><body><div><h1>This is a website (and sorry matt, p5 does not like http protocol)</h1></div></body></html>";
 
             outputStream.write(ArrayList2Array.byteArray(response));
 
             LOGGER.info("Thread " + this.getId() + " Response Sent!");
 
 
-        } catch (Exception e){
+        }catch (SocketException e){
+            LOGGER.error("Thread " + this.getId() +" connection closed unexpectedly", e);
+        }catch (Exception e){
             LOGGER.error("Thread " + this.getId() +" failed!", e);
         }finally{
             LOGGER.info("Thread " + this.getId() + " closing...");

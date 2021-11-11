@@ -48,8 +48,6 @@ public class ResponseGenerator {
         response.addHeader(new HttpHeader("Accept-Ranges", "bytes"));
 
         response.setMessageBody(getResource());
-        //do whatever needs to be done to the resource
-        //generate response itself
 
         if(response.getStatusLine().getStatusCode() != HttpStatusCode.SUCCESS_200){
             return sendStatusLineError();
