@@ -33,6 +33,7 @@ public class ResponseGenerator {
     }
 
     public ArrayList<Byte> generateResponse() {
+        System.out.println("GENERATE RESPONSE");
 
         response.setStatusLine(new HTTPStatusLine(new HttpVersion(1,1), HttpStatusCode.SUCCESS_200));
         if(HttpMethod.getMethod(request.getRequestLine().getMethod()) == null){

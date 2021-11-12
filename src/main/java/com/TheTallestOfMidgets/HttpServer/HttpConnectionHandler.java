@@ -8,6 +8,7 @@ import com.TheTallestOfMidgets.UTIL.ArrayList2Array;
 import com.TheTallestOfMidgets.UTIL.ArrayList2String;
 import com.TheTallestOfMidgets.UTIL.Logger;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -40,16 +41,21 @@ public class HttpConnectionHandler extends Thread{
         masterBlock: try {
             outputStream = client.getOutputStream();
             inputStream = client.getInputStream();
+            BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
             LOGGER.info("Thread " + this.getId() + " established connection with " + this.client.getInetAddress());
 
             LOGGER.info("Thread " + this.getId() + " reading request...");
 
             //TODO read browser request
             HttpRequest request;
-                if(inputStream.available() > 0) {
+                if(waitOnInput(inputStream)) {
                     HttpRequestParser httpRequestParser = new HttpRequestParser(inputStream);
                     request = httpRequestParser.parseRequest();
+                    request.print();
                 } else{
+                    System.out.println("sending dummy");
+                    String response = "HTTP/1.1 408 Request Timed Out" + CRLF;
+                    outputStream.write(response.getBytes());
                     break masterBlock;
                 }
 
@@ -57,11 +63,12 @@ public class HttpConnectionHandler extends Thread{
 
             //TODO respond
 
+            LOGGER.info("Thread " + this.getId() + " generating response");
+
             ArrayList<Byte> response;
             ResponseGenerator responseGenerator = new ResponseGenerator(request);
             response = responseGenerator.generateResponse();
 
-            LOGGER.info("Thread " + this.getId() + " generating response");
 
             outputStream.write(ArrayList2Array.byteArray(response));
 
@@ -90,5 +97,17 @@ public class HttpConnectionHandler extends Thread{
                 } catch (IOException ignored) {}
             }
         }
+    }
+
+    private boolean waitOnInput(InputStream inputStream) throws IOException {
+        for(int i = 0; i < 20; i++) {
+            if (inputStream.available() > 0) {
+                return true;
+            }
+            try {
+                sleep(100);
+            } catch (Exception ignored){}
+        }
+        return false;
     }
 }
