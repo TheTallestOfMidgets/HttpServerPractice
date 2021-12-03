@@ -5,114 +5,133 @@ import com.TheTallestOfMidgets.HttpProtocol.General.HttpStatusCode;
 import com.TheTallestOfMidgets.HttpProtocol.General.HttpVersion;
 import com.TheTallestOfMidgets.HttpProtocol.Request.HttpMethod;
 import com.TheTallestOfMidgets.HttpProtocol.Request.HttpRequest;
-import com.TheTallestOfMidgets.UTIL.Array2ArrayList;
 import com.TheTallestOfMidgets.UTIL.FileTypes;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.*;
-import java.lang.reflect.Array;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Date;
+
+/*
+TODO   GZIP compression
+ */
+
 
 public class ResponseGenerator {
     private final HttpRequest request;
     private HttpResponse response;
     private ArrayList<Byte> responseBody;
     private final String webRoot;
+    private final OutputStream outputStream;
 
-    private final ArrayList<Byte> CRLF;
+    private final byte[] CRLF;
 
-    public ResponseGenerator(HttpRequest request) {
-        CRLF = new ArrayList<>(); CRLF.add((byte) 13); CRLF.add((byte) 10);
+    public ResponseGenerator(HttpRequest request, OutputStream outputStream) {
+        CRLF = new byte[]{(byte) 13, (byte) 10};
         response = new HttpResponse();
         this.request = request;
         this.webRoot = "src\\main\\WebRoot\\";
+        this.outputStream = outputStream;
     }
 
-    public ArrayList<Byte> generateResponse() {
+    public void generateResponse() throws IOException {
         System.out.println("GENERATE RESPONSE");
+        System.out.println("flag1");
 
         response.setStatusLine(new HTTPStatusLine(new HttpVersion(1,1), HttpStatusCode.SUCCESS_200));
         if(HttpMethod.getMethod(request.getRequestLine().getMethod()) == null){
             response.setStatusCode(HttpStatusCode.SERVER_ERROR_501_METHOD_NOT_IMPLEMENTED);
-            return sendStatusLineError();
+            outputStream.write(sendStatusLineError());
+            return;
         }
         if(!request.getRequestLine().getVersion().equals(new HttpVersion(1,1))){
             response.setStatusCode(HttpStatusCode.SERVER_ERROR_505_HTTP_VERSION_UNSUPPORTED);
-            return sendStatusLineError();
+            outputStream.write(sendStatusLineError());
+            return;
         }
 
 
         response.addHeader(new HttpHeader("Accept-Ranges", "bytes"));
-
-        response.setMessageBody(getResource());
-
+        addRequestURIHeaders();
         if(response.getStatusLine().getStatusCode() != HttpStatusCode.SUCCESS_200){
-            return sendStatusLineError();
+            outputStream.write(sendStatusLineError());
+            return;
         }
-
-        ArrayList<Byte> reply = new ArrayList<>();
+        System.out.println("flag2");
 
         //status line
-        reply.addAll(Array2ArrayList.byteArray("HTTP/1.1 200 OK".getBytes()));
-        reply.addAll(CRLF);
+        outputStream.write("HTTP/1.1 200 OK".getBytes());
+        outputStream.write(CRLF);
+
+        System.out.println("flag3");
 
         //headers
         for(HttpHeader header : response.getHeaders()){
-            reply.addAll(Array2ArrayList.byteArray((header.getField() + ": " + header.getValue()).getBytes()));
-            reply.addAll(CRLF);
+            outputStream.write((header.getField() + ": " + header.getValue()).getBytes());
+            outputStream.write(CRLF);
         }
 
+        System.out.println("flag4");
+
         //messageBody
-        reply.addAll(CRLF);
-        reply.addAll(response.getMessageBody());
-
-        return reply;
-
+        outputStream.write(CRLF);
+        getAndSendResource();
+        System.out.println("flag5");
     }
 
-    private ArrayList<Byte> getResource(){
+    private void addRequestURIHeaders() {
+        if(!request.getRequestLine().getRequestURI().equalsIgnoreCase("/")) {
+            String fileSuffix = (request.getRequestLine().getRequestURI().split("\\."))[1];
+            response.addHeader(new HttpHeader("Content-Type", FileTypes.getContentType(fileSuffix)));
+        }else {
+            response.addHeader(new HttpHeader("Content-Type", FileTypes.htmlText.getType()));
+        }
+        try {
+            if(request.getRequestLine().getRequestURI().equals("/")) {
+                response.addHeader(new HttpHeader("Content-Length", String.valueOf(new File(webRoot + "index.html").length())));
+            }else {
+                response.addHeader(new HttpHeader("Content-Length", String.valueOf(new File(webRoot + request.getRequestLine().getRequestURI()).length())));
+            }
+        }catch (Exception e) {
+            response.setStatusCode(HttpStatusCode.CLIENT_ERROR_404_RESOURCE_NOT_FOUND);
+        }
+    }
 
-        ArrayList<Byte> data = new ArrayList<>();
+    private void getAndSendResource(){
         FileInputStream fileInputStream = null;
         try {
             if (request.getRequestLine().getRequestURI().equals("/")) {
                 File requestedFile = new File(webRoot + "index.html");
                 fileInputStream = new FileInputStream(requestedFile);
-                byte[] fileOutPut = new byte[ (int) requestedFile.length()];
-                fileInputStream.read(fileOutPut);
-                data.addAll(Array2ArrayList.byteArray(fileOutPut));
+                byte[] packetSize;
+                for(int i = 0; i < requestedFile.length(); i++){
+                    System.out.println("Active Threads: " + Thread.activeCount());
+                    packetSize = new byte[1000];
+                    fileInputStream.read(packetSize);
+                    outputStream.write(packetSize);
+
+                }
                 fileInputStream.close();
-
-                response.addHeader(new HttpHeader("Content-Type", FileTypes.htmlText.getType()));
             } else {
-
                 File requestedFile = new File(webRoot + request.getRequestLine().getRequestURI());
                 fileInputStream = new FileInputStream(requestedFile);
-                byte[] fileOutPut = new byte[ (int) requestedFile.length()];
-                fileInputStream.read(fileOutPut);
 
-                data.addAll(Array2ArrayList.byteArray(fileOutPut));
+                byte[] packetSize;
+                for(int i = 0; i < requestedFile.length(); i++){
+                    System.out.println("Active Threads: " + Thread.activeCount());
+                    packetSize = new byte[1000];
+                    fileInputStream.read(packetSize);
+                    outputStream.write(packetSize);
+
+                }
 
                 fileInputStream.close();
-
-                String fileSuffix = (request.getRequestLine().getRequestURI().split("\\."))[1];
-                response.addHeader(new HttpHeader("Content-Type", FileTypes.getContentType(fileSuffix)));
-                System.out.println("File Suffix: " + fileSuffix);
             }
-            response.addHeader(new HttpHeader("Content-Length", String.valueOf(data.size())));
 
-            return data;
+
         } catch (FileNotFoundException e) {
             response.setStatusCode(HttpStatusCode.CLIENT_ERROR_404_RESOURCE_NOT_FOUND);
-            return null;
         }catch (Exception e){
             response.setStatusCode(HttpStatusCode.SERVER_ERROR_500_INTERNAL_SERVER_ERROR);
             e.printStackTrace();
-            return null;
         }finally {
             if(fileInputStream != null){
                 try {
@@ -122,12 +141,12 @@ public class ResponseGenerator {
         }
     }
 
-    private ArrayList<Byte> sendStatusLineError(){
-        return Array2ArrayList.byteArray(("HTTP/" +
+    private byte[] sendStatusLineError(){
+        return ("HTTP/" +
                 response.getStatusLine().getVersion().getMajor() + "." +
                 response.getStatusLine().getVersion().getMinor() + " " +
                 response.getStatusLine().getStatusCode().getCode() + " " +
                 response.getStatusLine().getStatusCode().getMessage() +
-                "\n\r").getBytes());
+                "\n\r").getBytes();
     }
 }

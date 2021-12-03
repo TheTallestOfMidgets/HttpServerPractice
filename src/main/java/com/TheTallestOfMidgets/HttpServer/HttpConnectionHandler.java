@@ -53,7 +53,6 @@ public class HttpConnectionHandler extends Thread{
                     request = httpRequestParser.parseRequest();
                     request.print();
                 } else{
-                    System.out.println("sending dummy");
                     String response = "HTTP/1.1 408 Request Timed Out" + CRLF;
                     outputStream.write(response.getBytes());
                     break masterBlock;
@@ -66,11 +65,8 @@ public class HttpConnectionHandler extends Thread{
             LOGGER.info("Thread " + this.getId() + " generating response");
 
             ArrayList<Byte> response;
-            ResponseGenerator responseGenerator = new ResponseGenerator(request);
-            response = responseGenerator.generateResponse();
-
-
-            outputStream.write(ArrayList2Array.byteArray(response));
+            ResponseGenerator responseGenerator = new ResponseGenerator(request, outputStream);
+            responseGenerator.generateResponse();
 
             LOGGER.info("Thread " + this.getId() + " Response Sent!");
 

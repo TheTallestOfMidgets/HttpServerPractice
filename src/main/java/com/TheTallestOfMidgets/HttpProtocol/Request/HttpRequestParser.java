@@ -7,7 +7,6 @@ import com.TheTallestOfMidgets.UTIL.ArrayList2String;
 import com.TheTallestOfMidgets.UTIL.Logger;
 import jdk.nashorn.internal.runtime.ParserException;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 
@@ -88,7 +87,7 @@ public class HttpRequestParser{
 
                 } else if (hasMessageBody && !messageBodyRead) {
                     requestBuffer.add(_byte);
-                    for (int i = 0; i < Integer.parseInt(request.getValue("content-length")) - 1; i++) {
+                    for (int i = 0; i < Integer.parseInt(request.getHeaderValue("content-length")) - 1; i++) {
                         _byte = inputStream.read();
                         requestBuffer.add(_byte);
                     }

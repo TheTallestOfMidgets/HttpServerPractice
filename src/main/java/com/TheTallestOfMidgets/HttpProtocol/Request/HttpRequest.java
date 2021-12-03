@@ -25,7 +25,7 @@ public class HttpRequest { //what the client sends to the server, packed into on
         return headers;
     }
 
-    public String getValue(String headerName){
+    public String getHeaderValue(String headerName){
         for(HttpHeader header : headers){
             if(headerName.equals(header.getField())){
                 return header.getValue();
@@ -57,5 +57,13 @@ public class HttpRequest { //what the client sends to the server, packed into on
             System.out.println("Message Body: ");
             System.out.println("     " + messageBody + "\n ");
         }
+    }
+    public boolean hasHeader(String headerName){
+        for(HttpHeader header : this.headers){
+            if(header.getField().equalsIgnoreCase(headerName)){
+                return true;
+            }
+        }
+        return false;
     }
 }
