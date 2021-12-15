@@ -51,7 +51,7 @@ public class HttpConnectionHandler extends Thread{
                 if(waitOnInput(inputStream)) {
                     HttpRequestParser httpRequestParser = new HttpRequestParser(inputStream);
                     request = httpRequestParser.parseRequest();
-                    request.print();
+                    //request.print();
                 } else{
                     String response = "HTTP/1.1 408 Request Timed Out" + CRLF;
                     outputStream.write(response.getBytes());

@@ -23,6 +23,7 @@ public class ResponseGenerator {
     private final OutputStream outputStream;
 
     private final byte[] CRLF;
+    private final int packetSizeAllocation = 500000000;
 
     public ResponseGenerator(HttpRequest request, OutputStream outputStream) {
         CRLF = new byte[]{(byte) 13, (byte) 10};
@@ -34,7 +35,6 @@ public class ResponseGenerator {
 
     public void generateResponse() throws IOException {
         System.out.println("GENERATE RESPONSE");
-        System.out.println("flag1");
 
         response.setStatusLine(new HTTPStatusLine(new HttpVersion(1,1), HttpStatusCode.SUCCESS_200));
         if(HttpMethod.getMethod(request.getRequestLine().getMethod()) == null){
@@ -55,13 +55,10 @@ public class ResponseGenerator {
             outputStream.write(sendStatusLineError());
             return;
         }
-        System.out.println("flag2");
 
         //status line
         outputStream.write("HTTP/1.1 200 OK".getBytes());
         outputStream.write(CRLF);
-
-        System.out.println("flag3");
 
         //headers
         for(HttpHeader header : response.getHeaders()){
@@ -69,12 +66,10 @@ public class ResponseGenerator {
             outputStream.write(CRLF);
         }
 
-        System.out.println("flag4");
-
         //messageBody
         outputStream.write(CRLF);
         getAndSendResource();
-        System.out.println("flag5");
+
     }
 
     private void addRequestURIHeaders() {
@@ -101,12 +96,11 @@ public class ResponseGenerator {
             if (request.getRequestLine().getRequestURI().equals("/")) {
                 File requestedFile = new File(webRoot + "index.html");
                 fileInputStream = new FileInputStream(requestedFile);
-                byte[] packetSize;
+                byte[] packet;
                 for(int i = 0; i < requestedFile.length(); i++){
-                    System.out.println("Active Threads: " + Thread.activeCount());
-                    packetSize = new byte[1000];
-                    fileInputStream.read(packetSize);
-                    outputStream.write(packetSize);
+                    packet = new byte[packetSizeAllocation / (Thread.activeCount() - 2 )];
+                    fileInputStream.read(packet);
+                    outputStream.write(packet);
 
                 }
                 fileInputStream.close();
@@ -114,12 +108,11 @@ public class ResponseGenerator {
                 File requestedFile = new File(webRoot + request.getRequestLine().getRequestURI());
                 fileInputStream = new FileInputStream(requestedFile);
 
-                byte[] packetSize;
+                byte[] packet;
                 for(int i = 0; i < requestedFile.length(); i++){
-                    System.out.println("Active Threads: " + Thread.activeCount());
-                    packetSize = new byte[1000];
-                    fileInputStream.read(packetSize);
-                    outputStream.write(packetSize);
+                    packet = new byte[packetSizeAllocation / (Thread.activeCount() - 2 )];
+                    fileInputStream.read(packet);
+                    outputStream.write(packet);
 
                 }
 

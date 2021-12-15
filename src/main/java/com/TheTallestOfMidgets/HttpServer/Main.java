@@ -16,7 +16,7 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         LOGGER.info("Server Starting");
-        HttpListenerThread httpListenerThread = new HttpListenerThread(8080);
+        HttpListenerThread httpListenerThread = new HttpListenerThread(80);
         httpListenerThread.start();
         LOGGER.info("Listener Thread Booting...");
     }

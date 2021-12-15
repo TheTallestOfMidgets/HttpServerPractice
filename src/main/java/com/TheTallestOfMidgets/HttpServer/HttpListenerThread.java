@@ -36,7 +36,7 @@ public class HttpListenerThread extends Thread{
                 client = serverSocket.accept();
                 LOGGER.info("Incoming Connection from " + client.getInetAddress());
                 HttpConnectionHandler httpConnectionHandler = new HttpConnectionHandler(client);
-                httpConnectionHandler.run();
+                httpConnectionHandler.start();
             } catch (IOException ignored) {}
         }
     }
