@@ -18,27 +18,24 @@ public class Logger {
 
 
     public void info(String msg){
-        String terminalString = java.time.LocalTime.now() +" " +
-                "[" + clazz.getSimpleName() + "] " +"INFO " +
-                clazz.getPackage().toString().replace("package ","") +
+        String terminalString = "[" + new StringBuilder(java.time.LocalTime.now().toString()).delete(12,18) +"]" +
+                "[" + clazz.getSimpleName() + "/INFO" +"]" +
                 " - "  + msg;
         System.out.println(terminalString);
     }
 
     public void debug(String msg){
         if(debugMode) {
-            String terminalString = java.time.LocalTime.now() + " " +
-                    "[" + clazz.getSimpleName() + "] " + "DEBUG " +
-                    clazz.getPackage().toString().replace("package ", "") +
-                    " - " + msg;
+            String terminalString = "[" + new StringBuilder(java.time.LocalTime.now().toString()).delete(12,18) +"]" +
+                    "[" + clazz.getSimpleName() + "/DEBUG" +"]" +
+                    " - "  + msg;
             System.out.println(terminalString);
         }
     }
 
     public void error(String msg, Exception e){
-        String terminalString = java.time.LocalTime.now() +" " +
-                "[" + clazz.getSimpleName() + "] " +"ERROR " +
-                clazz.getPackage().toString().replace("package ","") +
+        String terminalString = "[" + new StringBuilder(java.time.LocalTime.now().toString()).delete(12,18) +"]" +
+                "[" + clazz.getSimpleName() + "/ERROR" +"]" +
                 " - "  + msg;
         System.out.println(terminalString);
         e.printStackTrace();
