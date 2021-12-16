@@ -55,10 +55,16 @@ public class ResponseGenerator {
             outputStream.write(sendStatusLineError());
             return;
         }
+        if(!new File(webRoot + request.getRequestLine().getRequestURI()).exists()){
+            response.setStatusCode(HttpStatusCode.CLIENT_ERROR_404_RESOURCE_NOT_FOUND);
+            outputStream.write(sendStatusLineError());
+            return;
+        }
 
         //status line
         outputStream.write("HTTP/1.1 200 OK".getBytes());
         outputStream.write(CRLF);
+
 
         //headers
         for(HttpHeader header : response.getHeaders()){
@@ -69,7 +75,6 @@ public class ResponseGenerator {
         //messageBody
         outputStream.write(CRLF);
         getAndSendResource();
-
     }
 
     private void addRequestURIHeaders() {
@@ -121,7 +126,7 @@ public class ResponseGenerator {
 
 
         } catch (FileNotFoundException e) {
-            response.setStatusCode(HttpStatusCode.CLIENT_ERROR_404_RESOURCE_NOT_FOUND);
+            response.setStatusCode(HttpStatusCode.CLIENT_ERROR_404_RESOURCE_NOT_FOUND); //Should never be thrown, Redundancy
         }catch (Exception e){
             response.setStatusCode(HttpStatusCode.SERVER_ERROR_500_INTERNAL_SERVER_ERROR);
             e.printStackTrace();

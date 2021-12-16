@@ -3,9 +3,6 @@ package com.TheTallestOfMidgets.HttpServer;
 import com.TheTallestOfMidgets.HttpProtocol.Request.HttpRequest;
 import com.TheTallestOfMidgets.HttpProtocol.Request.HttpRequestParser;
 import com.TheTallestOfMidgets.HttpProtocol.Response.ResponseGenerator;
-import com.TheTallestOfMidgets.UTIL.Array2ArrayList;
-import com.TheTallestOfMidgets.UTIL.ArrayList2Array;
-import com.TheTallestOfMidgets.UTIL.ArrayList2String;
 import com.TheTallestOfMidgets.UTIL.Logger;
 
 import java.io.BufferedInputStream;
@@ -14,9 +11,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.net.SocketException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class HttpConnectionHandler extends Thread{
 
@@ -60,11 +55,8 @@ public class HttpConnectionHandler extends Thread{
 
             LOGGER.info("Thread " + this.getId() + " Done!");
 
-            //TODO respond
-
             LOGGER.info("Thread " + this.getId() + " generating response");
 
-            ArrayList<Byte> response;
             ResponseGenerator responseGenerator = new ResponseGenerator(request, outputStream);
             responseGenerator.generateResponse();
 

@@ -5,7 +5,6 @@ import com.TheTallestOfMidgets.HttpProtocol.General.HttpHeader;
 import com.TheTallestOfMidgets.HttpProtocol.General.HttpVersion;
 import com.TheTallestOfMidgets.UTIL.ArrayList2String;
 import com.TheTallestOfMidgets.UTIL.Logger;
-import jdk.nashorn.internal.runtime.ParserException;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -105,7 +104,7 @@ public class HttpRequestParser{
         }
         return null;
     }
-    private HttpRequestLine parseRequestLine(ArrayList<Integer> rawRequest) throws ParserException{
+    private HttpRequestLine parseRequestLine(ArrayList<Integer> rawRequest) throws HttpParsingException {
         try {
             String requestLine = ArrayList2String.IntArray(rawRequest);
             String[] pieces = requestLine.split(" ");
@@ -118,10 +117,10 @@ public class HttpRequestParser{
 
             return new HttpRequestLine(method, requestURI, version);
         }catch (Exception e){
-            throw new ParserException("Request Line Parsing failed");
+            throw new HttpParsingException("Request Line Parsing failed");
         }
     }
-    private HttpHeader parseHeader(ArrayList<Integer> rawRequest) throws ParserException{
+    private HttpHeader parseHeader(ArrayList<Integer> rawRequest) throws HttpParsingException{
         try {
             String header = ArrayList2String.IntArray(rawRequest);
             String[] pieces = header.split(":");
@@ -130,14 +129,14 @@ public class HttpRequestParser{
 
             return new HttpHeader(field, value);
         }catch (Exception e){
-            throw new ParserException("Header Parsing Failed");
+            throw new HttpParsingException("Header Parsing Failed");
         }
     }
-    private String parseMessageBody(ArrayList<Integer> rawRequest) throws ParserException{
+    private String parseMessageBody(ArrayList<Integer> rawRequest) throws HttpParsingException{
         try {
             return ArrayList2String.IntArray(rawRequest);
         }catch (Exception e){
-            throw new ParserException("Header Parsing Failed");
+            throw new HttpParsingException("Header Parsing Failed");
         }
     }
 }
