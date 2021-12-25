@@ -10,4 +10,12 @@ public class ArrayList2String {
         }
         return str.toString();
     }
+
+    public static String byteArray(ArrayList<Byte> arrayList ){
+        StringBuilder str = new StringBuilder();
+        for(Byte _byte : arrayList){
+            str.append((char) (int) _byte);
+        }
+        return str.toString();
+    }
 }

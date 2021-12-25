@@ -1,7 +1,5 @@
-- Interpret requests
-- Implement GET and HEAD request methods
-- Implement status codes
+- Implement GET and POST request methods
 - Create a YML configuration manager
 - Add file writing support for LOGGER
 - Add GUI for jar file
-- Add functioning webroot
+- Create a default config and webroot (ie. creates basic files, allowing the user to later motify them)

@@ -1,12 +1,17 @@
 package com.TheTallestOfMidgets.HttpServer;
 
+import com.TheTallestOfMidgets.HttpProtocol.Request.HttpRequest;
 import com.TheTallestOfMidgets.HttpProtocol.Request.HttpRequestParser;
+import com.TheTallestOfMidgets.HttpProtocol.Response.ResponseGenerator;
 import com.TheTallestOfMidgets.UTIL.Logger;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.net.SocketException;
+import java.util.ArrayList;
 
 public class HttpConnectionHandler extends Thread{
 
@@ -28,38 +33,39 @@ public class HttpConnectionHandler extends Thread{
         OutputStream outputStream = null;
         InputStream inputStream = null;
 
-        try {
+        masterBlock: try {
             outputStream = client.getOutputStream();
             inputStream = client.getInputStream();
+            BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
             LOGGER.info("Thread " + this.getId() + " established connection with " + this.client.getInetAddress());
 
             LOGGER.info("Thread " + this.getId() + " reading request...");
 
             //TODO read browser request
-                if(inputStream.available() > 0) {
+            HttpRequest request;
+                if(waitOnInput(inputStream)) {
                     HttpRequestParser httpRequestParser = new HttpRequestParser(inputStream);
-                    httpRequestParser.parseRequest().print();
+                    request = httpRequestParser.parseRequest();
+                    //request.print();
+                } else{
+                    String response = "HTTP/1.1 408 Request Timed Out" + CRLF;
+                    outputStream.write(response.getBytes());
+                    break masterBlock;
                 }
 
             LOGGER.info("Thread " + this.getId() + " Done!");
 
-            //TODO respond
             LOGGER.info("Thread " + this.getId() + " generating response");
-            String html = "<html><head><title>YOOO I'm In a tab</title><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"></head><body><div><h1>This is a website (and sorry matt, p5 does not like http protocol)</h1></div></body></html>";
 
+            ResponseGenerator responseGenerator = new ResponseGenerator(request, outputStream);
+            responseGenerator.generateResponse();
 
-            String response = "HTTP/1.1 200 OK" + CRLF +
-                    "Content-Length: " + html.getBytes().length + CRLF +
-                    CRLF +
-                    html +
-                    CRLF + CRLF;
-
-            outputStream.write(response.getBytes());
             LOGGER.info("Thread " + this.getId() + " Response Sent!");
 
 
-
-        } catch (Exception e){
+        }catch (SocketException e){
+            LOGGER.error("Thread " + this.getId() +" connection closed unexpectedly", e);
+        }catch (Exception e){
             LOGGER.error("Thread " + this.getId() +" failed!", e);
         }finally{
             LOGGER.info("Thread " + this.getId() + " closing...");
@@ -79,5 +85,17 @@ public class HttpConnectionHandler extends Thread{
                 } catch (IOException ignored) {}
             }
         }
+    }
+
+    private boolean waitOnInput(InputStream inputStream) throws IOException {
+        for(int i = 0; i < 20; i++) {
+            if (inputStream.available() > 0) {
+                return true;
+            }
+            try {
+                sleep(100);
+            } catch (Exception ignored){}
+        }
+        return false;
     }
 }

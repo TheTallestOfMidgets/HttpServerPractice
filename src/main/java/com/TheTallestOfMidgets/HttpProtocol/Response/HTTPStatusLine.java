@@ -7,7 +7,9 @@ public class HTTPStatusLine {
     private HttpVersion version;
     private HttpStatusCode statusCode;
 
-    public HTTPStatusLine(){
+    public HTTPStatusLine(HttpVersion version, HttpStatusCode statusCode){
+        this.version = version;
+        this.statusCode = statusCode;
     }
 
     public HttpStatusCode getStatusCode() {

@@ -3,14 +3,14 @@ package com.TheTallestOfMidgets.HttpProtocol.Request;
 import com.TheTallestOfMidgets.HttpProtocol.General.HttpStatusCode;
 
 public class HttpParsingException extends Exception{
-    private final HttpStatusCode errorCode;
+    private final String errorCode;
 
-    public HttpParsingException(HttpStatusCode errorCode){
-        super(errorCode.getMessage());
+    public HttpParsingException(String errorCode){
+        super(errorCode);
         this.errorCode = errorCode;
     }
 
-    public HttpStatusCode getErrorCode() {
+    public String getErrorCode() {
         return errorCode;
     }
 }
