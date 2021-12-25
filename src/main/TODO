@@ -1,0 +1,7 @@
+- Interpret requests
+- Implement GET and HEAD request methods
+- Implement status codes
+- Create a YML configuration manager
+- Add file writing support for LOGGER
+- Add GUI for jar file
+- Add functioning webroot
